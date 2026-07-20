@@ -1,0 +1,49 @@
+name: Community wallpaper submission / 社区壁纸投稿
+description: Submit an original or redistributable wallpaper for the public Dream Skin gallery
+title: "[Wallpaper] "
+labels: ["community-wallpaper", "needs-review"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Upload one landscape image by dragging it into the field below. Approved submissions are listed in the public app catalog. Do not submit copyrighted celebrity photos, screenshots, private data, or images you cannot redistribute.
+  - type: textarea
+    id: image
+    attributes:
+      label: Wallpaper file / 壁纸文件
+      description: Drag one JPG, PNG, or WebP here. Minimum 1920x900, landscape, maximum 50 MB.
+    validations:
+      required: true
+  - type: input
+    id: title
+    attributes:
+      label: Display title / 展示名称
+    validations:
+      required: true
+  - type: input
+    id: author
+    attributes:
+      label: Author or creator / 作者
+    validations:
+      required: true
+  - type: dropdown
+    id: license
+    attributes:
+      label: Public license / 公共许可
+      options:
+        - CC0 1.0
+        - CC BY 4.0
+        - CC BY-SA 4.0
+    validations:
+      required: true
+  - type: checkboxes
+    id: rights
+    attributes:
+      label: Rights confirmation / 权利确认
+      options:
+        - label: I created this image or have explicit permission to redistribute it under the selected license.
+          required: true
+        - label: The image contains no private data, UI screenshots, watermark, or unlicensed celebrity likeness.
+          required: true
+        - label: I understand submissions are moderated and may be rejected or removed.
+          required: true
