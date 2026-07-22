@@ -1,0 +1,69 @@
+name: Publish approved community wallpaper
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/publish-community-wallpaper.yml
+      - .github/ISSUE_TEMPLATE/community_wallpaper.yml
+  issues:
+    types: [labeled]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: Issue number to validate and publish
+        required: true
+        type: number
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: community-catalog
+  cancel-in-progress: false
+
+jobs:
+  setup-labels:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Create moderation labels
+        run: node scripts/ensure-labels.mjs
+
+  publish:
+    if: >-
+      (github.event_name == 'issues' && github.event.label.name == 'approved') ||
+      github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    env:
+      ISSUE_NUMBER: ${{ github.event.issue.number || inputs.issue_number }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Test publisher
+        run: node --test tests/publish-wallpaper.test.mjs
+      - name: Validate and update catalog
+        run: node scripts/publish-wallpaper.mjs
+      - name: Commit catalog
+        run: |
+          if git diff --quiet -- community/catalog.json; then
+            echo "Catalog already contains this submission."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add community/catalog.json
+          git commit -m "feat: publish wallpaper from issue #${ISSUE_NUMBER}"
+          git push
+      - name: Mark Issue as published
+        run: node scripts/mark-published.mjs
