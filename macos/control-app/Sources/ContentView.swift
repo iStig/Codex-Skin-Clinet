@@ -469,8 +469,11 @@ private struct OnlineWallpaperTile: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 9) {
-      ZStack(alignment: .bottom) {
-        CachedRemoteImage(url: wallpaper.thumbnailURL)
+      CachedRemoteImage(url: wallpaper.thumbnailURL)
+        .frame(maxWidth: .infinity)
+        .frame(height: 132)
+        .background(Color(nsColor: .quaternaryLabelColor))
+        .overlay(alignment: .bottom) {
         if let downloadStatus {
           VStack(spacing: 6) {
             if downloadStatus.isProcessing {
@@ -479,20 +482,24 @@ private struct OnlineWallpaperTile: View {
                 Text(L10n.text("Saving Theme…"))
               }
             } else {
-              ProgressView(value: downloadStatus.progress)
-              HStack {
+              HStack(spacing: 8) {
+                ProgressView(value: downloadStatus.progress)
+                  .frame(maxWidth: .infinity)
                 Text(downloadStatus.progress.formatted(.percent.precision(.fractionLength(0))))
                   .monospacedDigit()
-                Spacer()
                 Button(action: downloadStatus.isPaused ? resumeAction : pauseAction) {
                   Image(systemName: downloadStatus.isPaused ? "play.fill" : "pause.fill")
                 }
+                .buttonStyle(.borderless)
+                .frame(width: 20, height: 20)
                 .help(downloadStatus.isPaused
                   ? L10n.text("Resume Download")
                   : L10n.text("Pause Download"))
                 Button(role: .cancel, action: cancelAction) {
                   Image(systemName: "xmark")
                 }
+                .buttonStyle(.borderless)
+                .frame(width: 20, height: 20)
                 .help(L10n.text("Cancel Download"))
               }
             }
@@ -502,11 +509,8 @@ private struct OnlineWallpaperTile: View {
           .background(.regularMaterial)
         }
       }
-      .frame(maxWidth: .infinity)
-      .frame(height: 132)
-      .background(Color(nsColor: .quaternaryLabelColor))
-      .clipped()
-      .clipShape(RoundedRectangle(cornerRadius: 5))
+        .clipped()
+        .clipShape(RoundedRectangle(cornerRadius: 5))
 
       Text(wallpaper.title)
         .font(.callout.weight(.medium))
