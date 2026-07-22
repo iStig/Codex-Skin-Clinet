@@ -321,12 +321,19 @@ enum OnlineWallpaperService {
     return url
   }
 
-  private static func trustedCommunityImageURL(_ value: String?, allowRedirectHost: Bool) -> URL? {
+  static func trustedCommunityImageURL(_ value: String?, allowRedirectHost: Bool) -> URL? {
     guard let value, let url = URL(string: value), url.scheme == "https",
           let host = url.host?.lowercased() else { return nil }
     if host == "github.com" && url.path.hasPrefix("/user-attachments/assets/") { return url }
     if host == "raw.githubusercontent.com" && url.path.hasPrefix("/iStig/Codex-Skin-Clinet/") { return url }
-    if allowRedirectHost && host == "objects.githubusercontent.com" { return url }
+    if allowRedirectHost && (
+      host == "githubusercontent.com" ||
+      host.hasSuffix(".githubusercontent.com") ||
+      host.range(
+        of: #"^github-production-user-asset(?:-[a-z0-9-]+)?\.s3\.amazonaws\.com$"#,
+        options: .regularExpression
+      ) != nil
+    ) { return url }
     return nil
   }
 

@@ -132,6 +132,22 @@ struct OnlineWallpaperServiceTests {
     guard communityResults[0].provider == "Dream Skin Community" else {
       throw TestError("community provider metadata failed")
     }
+    let githubRedirects = [
+      "https://objects.githubusercontent.com/path/image.jpg",
+      "https://private-user-images.githubusercontent.com/path/image.jpg",
+      "https://github-production-user-asset-6210df.s3.amazonaws.com/path/image.jpg"
+    ]
+    guard githubRedirects.allSatisfy({
+      OnlineWallpaperService.trustedCommunityImageURL($0, allowRedirectHost: true) != nil
+    }) else { throw TestError("GitHub attachment redirect trust failed") }
+    let unsafeRedirects = [
+      "http://objects.githubusercontent.com/path/image.jpg",
+      "https://githubusercontent.com.evil.example/path/image.jpg",
+      "https://unrelated-bucket.s3.amazonaws.com/path/image.jpg"
+    ]
+    guard unsafeRedirects.allSatisfy({
+      OnlineWallpaperService.trustedCommunityImageURL($0, allowRedirectHost: true) == nil
+    }) else { throw TestError("unsafe attachment redirect accepted") }
     print("PASS: online/community parsing, metadata cleanup, trust, and suitability filters.")
   }
 }
