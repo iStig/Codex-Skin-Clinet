@@ -4,7 +4,22 @@ import { readImageMetadata } from "./image-metadata.mjs";
 const MAX_BYTES = 50 * 1024 * 1024;
 const LICENSES = new Set(["CC0 1.0", "CC BY 4.0", "CC BY-SA 4.0"]);
 const ATTACHMENT_PATTERN = /^https:\/\/github\.com\/user-attachments\/assets\/[0-9a-f-]+$/i;
-const REDIRECT_HOSTS = new Set(["github.com", "objects.githubusercontent.com"]);
+const REDIRECT_HOSTS = new Set(["github.com", "githubusercontent.com"]);
+const GITHUB_ASSET_S3_HOST = /^github-production-user-asset(?:-[a-z0-9-]+)?\.s3\.amazonaws\.com$/;
+
+export function isTrustedImageURL(value) {
+  let url;
+  try {
+    url = new URL(value);
+  } catch {
+    return false;
+  }
+  if (url.protocol !== "https:") return false;
+  const hostname = url.hostname.toLowerCase();
+  return REDIRECT_HOSTS.has(hostname) ||
+    hostname.endsWith(".githubusercontent.com") ||
+    GITHUB_ASSET_S3_HOST.test(hostname);
+}
 
 function section(body, heading) {
   const marker = `### ${heading}`;
@@ -38,8 +53,7 @@ export function parseSubmission(body) {
 async function downloadImage(url) {
   const response = await fetch(url, { redirect: "follow" });
   if (!response.ok || !response.body) throw new Error(`Image download failed: HTTP ${response.status}`);
-  const finalURL = new URL(response.url);
-  if (finalURL.protocol !== "https:" || !REDIRECT_HOSTS.has(finalURL.hostname.toLowerCase())) {
+  if (!isTrustedImageURL(response.url)) {
     throw new Error("Image download redirected to an untrusted host.");
   }
   const declaredLength = Number(response.headers.get("content-length") || 0);

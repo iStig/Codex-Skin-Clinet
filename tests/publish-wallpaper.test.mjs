@@ -1,5 +1,10 @@
 import assert from "node:assert/strict";
-import { addCatalogItem, parseSubmission, validateImage } from "../scripts/publish-wallpaper.mjs";
+import {
+  addCatalogItem,
+  isTrustedImageURL,
+  parseSubmission,
+  validateImage,
+} from "../scripts/publish-wallpaper.mjs";
 
 const body = `### Wallpaper file / 壁纸文件
 
@@ -30,6 +35,13 @@ assert.throws(() => parseSubmission(body.replace("- [x] Third", "- [ ] Third")),
 assert.throws(() => parseSubmission(body.replace("CC0 1.0", "Copyright")), /license/);
 assert.throws(() => parseSubmission(body.replace("github.com/user-attachments", "example.com")), /GitHub-hosted/);
 
+assert.equal(isTrustedImageURL("https://objects.githubusercontent.com/path/image.jpg"), true);
+assert.equal(isTrustedImageURL("https://private-user-images.githubusercontent.com/path/image.jpg"), true);
+assert.equal(isTrustedImageURL("https://github-production-user-asset-6210df.s3.amazonaws.com/path/image.jpg"), true);
+assert.equal(isTrustedImageURL("https://githubusercontent.com.evil.example/path/image.jpg"), false);
+assert.equal(isTrustedImageURL("https://unrelated-bucket.s3.amazonaws.com/path/image.jpg"), false);
+assert.equal(isTrustedImageURL("http://objects.githubusercontent.com/path/image.jpg"), false);
+
 const png = Buffer.alloc(24);
 png.set([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 png.writeUInt32BE(13, 8);
@@ -53,4 +65,4 @@ assert.equal(first.item.id, 1000001);
 assert.equal(first.item.detailsURL, "https://github.com/iStig/Codex-Skin-Clinet/issues/1");
 assert.equal(addCatalogItem(catalog, submission, first.item, 1).changed, false);
 
-console.log("PASS: submission parsing, image validation, catalog IDs, and deduplication.");
+console.log("PASS: submission parsing, redirect trust, image validation, catalog IDs, and deduplication.");
