@@ -7,7 +7,7 @@ struct ContentView: View {
   @State private var selectedSection = LibrarySection.local
   @State private var onlineQuery = "cinematic landscape"
   @State private var onlineSource = OnlineGallerySource.wikimedia
-  @State private var hasLoadedInitialOnlineGallery = false
+  @State private var initiallyLoadedOnlineSources = Set<OnlineGallerySource>()
 
   private var statusColor: Color {
     if model.status.isActive { return .green }
@@ -53,9 +53,12 @@ struct ContentView: View {
       Button(L10n.text("Cancel"), role: .cancel) { themeToDelete = nil }
     }
     .onChange(of: selectedSection) { section in
-      guard section == .online, !hasLoadedInitialOnlineGallery else { return }
-      hasLoadedInitialOnlineGallery = true
-      refreshOnline()
+      guard section == .online else { return }
+      loadOnlineSourceIfNeeded()
+    }
+    .onChange(of: onlineSource) { _ in
+      guard selectedSection == .online else { return }
+      loadOnlineSourceIfNeeded()
     }
   }
 
@@ -391,9 +394,16 @@ struct ContentView: View {
     if onlineSource == .wikimedia { searchOnline() }
     else { Task { await model.loadCommunityWallpapers() } }
   }
+
+  private func loadOnlineSourceIfNeeded() {
+    var loadedSources = initiallyLoadedOnlineSources
+    guard loadedSources.insert(onlineSource).inserted else { return }
+    initiallyLoadedOnlineSources = loadedSources
+    refreshOnline()
+  }
 }
 
-private enum OnlineGallerySource: CaseIterable, Identifiable {
+private enum OnlineGallerySource: CaseIterable, Hashable, Identifiable {
   case wikimedia
   case community
   var id: Self { self }
