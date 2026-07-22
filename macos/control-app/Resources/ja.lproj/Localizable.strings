@@ -87,6 +87,8 @@
 "Community" = "コミュニティ";
 "Load Community Gallery" = "コミュニティギャラリーを読み込む";
 "Submit Wallpaper" = "壁紙を投稿";
+"Upload requirements" = "アップロード要件";
+"JPG, PNG, or WebP • At least 1920 × 900 • Landscape aspect ratio 1.45–2.6 • Maximum 50 MB" = "JPG、PNG、WebP • 1920 × 900 以上 • 横長比率 1.45～2.6 • 最大 50 MB";
 "Loading community wallpapers…" = "コミュニティ壁紙を読み込み中…";
 "Found %d community wallpapers" = "%d 枚のコミュニティ壁紙が見つかりました";
 "Local Wallpapers" = "ローカル壁紙";

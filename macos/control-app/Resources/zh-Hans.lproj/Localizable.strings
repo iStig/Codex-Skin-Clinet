@@ -87,6 +87,8 @@
 "Community" = "社区";
 "Load Community Gallery" = "加载社区图库";
 "Submit Wallpaper" = "投稿壁纸";
+"Upload requirements" = "上传要求";
+"JPG, PNG, or WebP • At least 1920 × 900 • Landscape aspect ratio 1.45–2.6 • Maximum 50 MB" = "JPG、PNG 或 WebP • 最低 1920 × 900 • 横向比例 1.45–2.6 • 最大 50 MB";
 "Loading community wallpapers…" = "正在加载社区壁纸…";
 "Found %d community wallpapers" = "找到 %d 张社区壁纸";
 "Local Wallpapers" = "本地壁纸";

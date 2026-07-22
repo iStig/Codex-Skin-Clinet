@@ -298,6 +298,23 @@ struct ContentView: View {
         }
       }
 
+      if onlineSource == .community {
+        HStack(alignment: .top, spacing: 8) {
+          Image(systemName: "info.circle.fill")
+            .foregroundStyle(.secondary)
+          VStack(alignment: .leading, spacing: 3) {
+            Text(L10n.text("Upload requirements"))
+              .font(.caption)
+              .fontWeight(.semibold)
+            Text(L10n.text("JPG, PNG, or WebP • At least 1920 × 900 • Landscape aspect ratio 1.45–2.6 • Maximum 50 MB"))
+              .font(.caption)
+              .foregroundStyle(.secondary)
+              .fixedSize(horizontal: false, vertical: true)
+          }
+        }
+        .accessibilityElement(children: .combine)
+      }
+
       HStack(spacing: 8) {
         if model.isSearchingOnline { ProgressView().controlSize(.small) }
         Text(model.onlineMessage)
