@@ -78,6 +78,7 @@ final class DreamSkinModel: ObservableObject {
     guard let installedVersion, let bundledVersion else { return false }
     return installedVersion != bundledVersion
       || !engineSupportsOnlineAttribution
+      || !engineSupportsCommunitySource
       || !engineSupportsExactCodexDetection
   }
 
@@ -105,6 +106,12 @@ final class DreamSkinModel: ObservableObject {
     let url = scriptURL("load-image-theme-macos.sh")
     guard let source = try? String(contentsOf: url, encoding: .utf8) else { return false }
     return source.contains("--source-url)") && source.contains("--source-provider)")
+  }
+
+  private var engineSupportsCommunitySource: Bool {
+    let url = scriptURL("write-theme.mjs")
+    guard let source = try? String(contentsOf: url, encoding: .utf8) else { return false }
+    return source.contains("/iStig/Codex-Skin-Clinet/issues/")
   }
 
   private var engineSupportsExactCodexDetection: Bool {
@@ -260,7 +267,7 @@ final class DreamSkinModel: ObservableObject {
       alertMessage = L10n.text("Install the skin engine first.")
       return
     }
-    guard engineSupportsOnlineAttribution else {
+    guard !engineNeedsUpdate else {
       alertMessage = L10n.text("Update the engine before applying online wallpapers.")
       return
     }
