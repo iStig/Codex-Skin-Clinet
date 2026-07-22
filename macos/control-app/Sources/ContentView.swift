@@ -7,6 +7,7 @@ struct ContentView: View {
   @State private var selectedSection = LibrarySection.local
   @State private var onlineQuery = "cinematic landscape"
   @State private var onlineSource = OnlineGallerySource.wikimedia
+  @State private var hasLoadedInitialOnlineGallery = false
 
   private var statusColor: Color {
     if model.status.isActive { return .green }
@@ -50,6 +51,11 @@ struct ContentView: View {
         themeToDelete = nil
       }
       Button(L10n.text("Cancel"), role: .cancel) { themeToDelete = nil }
+    }
+    .onChange(of: selectedSection) { section in
+      guard section == .online, !hasLoadedInitialOnlineGallery else { return }
+      hasLoadedInitialOnlineGallery = true
+      refreshOnline()
     }
   }
 
